@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .glass-container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 40px 30px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    color: #000;
+    overflow: hidden;
+    margin: 40px auto;
+  }
+
+  .glass-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, rgba(255, 0, 150, 0.1), rgba(0, 204, 255, 0.2));
+    transform: rotate(30deg);
+    z-index: -1;
+  }
+
+  .class-label {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid #fff;
+    color: #000;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    user-select: none;
+  }
+
+  .date {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    user-select: none;
+  }
+
+  .media-title {
+    margin-top: 20px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    color: #222;
+  }
+
+  .content {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #444;
+  }
+
+  .file {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  /* Custom audio player */
+  .audio-player {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .play-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 22px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+    transition: background 0.3s;
+    user-select: none;
+  }
+
+  .play-btn:hover {
+    background: rgba(255, 255, 255, 0.65);
+  }
+
+  .progress-container {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    height: 7px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .progress {
+    height: 100%;
+    background: #000;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.15s;
+  }
+
+  .time {
+    font-size: 0.95rem;
+    opacity: 0.85;
+    width: 55px;
+    text-align: right;
+    font-family: 'Courier New', Courier, monospace;
+    user-select: none;
+  }
+
+  .download-btn {
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: #000;
+    padding: 10px 22px;
+    border-radius: 14px;
+    font-weight: 600;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(6px);
+    user-select: none;
+  }
+
+  .download-btn:hover {
+    background: rgba(255, 255, 255, 0.65);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.22);
+  }
+
+  @media (max-width: 480px) {
+    .class-label {
+      width: 36px;
+      height: 36px;
+      font-size: 1rem;
+    }
+
+    .media-title {
+      font-size: 1.25rem;
+    }
+
+    .content {
+      font-size: 1rem;
+      margin-top: 16px;
+    }
+
+    .download-btn {
+      font-size: 0.9rem;
+      padding: 8px 18px;
+    }
+
+    .audio-player {
+      max-width: 100%;
+      gap: 14px;
+    }
+
+    .play-btn {
+      width: 42px;
+      height: 42px;
+      font-size: 18px;
+    }
+  }
+</style>
+
+
+     {% if current_user.has_role('admin') %}
+<a href="{{ url_for('add_homework') }}" style="display: block; max-width: 500px; margin: 40px auto 10px; font-weight: 600; color:#0077cc; text-align: center; text-decoration: none;">➕ Добавить новое</a>
+{% endif %}
+
+
+{% for el in homework %}
+  <div class="glass-container">
+    <div class="class-label">{{ el.grade.value }}</div>
+    <div class="date">{{ el.media.created_at.strftime('%d.%m.%Y') }}</div>
+
+    <div class="media-title">{{ el.media.title }}</div>
+    <div class="content">{{ el.media.content | safe }}</div>
+
+    {% if el.file and el.file.file_path %}
+      <div class="news-media">
+        {% if el.file.file_type == 'PICTURE_PATH' %}
+          {% set filename = el.file.file_path.split('static')[-1] %}
+          <img src="{{ url_for('static', filename=filename[1:]) }}" class="img-fluid" alt="Изображение новости">
+        {% elif el.file.file_type == 'VIDEO_PATH' %}
+          <video controls>
+            <source src="{{ url_for('static', filename=el.file.file_path) }}" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+          </video>
+        {% elif el.file.file_type == 'AUDIO_PATH' %}
+          <div class="file">
+            <div class="audio-player">
+              <button class="play-btn">▶️</button>
+              <div class="progress-container">
+                <div class="progress"></div>
+              </div>
+              <div class="time">0:00</div>
+            </div>
+            <a href="{{ el.media.audio_url }}" download class="download-btn">Скачать аудио</a>
+            <audio src="{{ el.media.audio_url }}"></audio>
+          </div>
+        {% elif el.file.file_type == 'DOCS_PATH' %}
+          <div class="news-doc">
+            📄 <a href="{{ url_for('static', filename=el.file.file_path) }}" target="_blank">Скачать документ</a>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div> <!-- ✅ ДОБАВЛЕНО: закрывающий div для .glass-container -->
+{% endfor %}
+
+<script>
+  document.querySelectorAll('.glass-container').forEach(container => {
+    const playBtn = container.querySelector('.play-btn');
+    const audio = container.querySelector('audio');
+    const progress = container.querySelector('.progress');
+    const progressContainer = container.querySelector('.progress-container');
+    const currentTimeText = container.querySelector('.time');
+
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        playBtn.textContent = '⏸️';
+      } else {
+        audio.pause();
+        playBtn.textContent = '▶️';
+      }
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = percent + '%';
+
+        const minutes = Math.floor(audio.currentTime / 60);
+        const seconds = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+        currentTimeText.textContent = `${minutes}:${seconds}`;
+      }
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+      const width = progressContainer.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audio.duration;
+
+      if(duration) {
+        audio.currentTime = (clickX / width) * duration;
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      playBtn.textContent = '▶️';
+      progress.style.width = '0%';
+      currentTimeText.textContent = '0:00';
+    });
+  });
+</script>
+{% endblock %}

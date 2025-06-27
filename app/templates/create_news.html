@@ -1,0 +1,10 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+{% set is_homework = false %}
+{% set form_action = url_for('create_news') %}
+{% include "add_note.html" %}
+
+{% endblock %}

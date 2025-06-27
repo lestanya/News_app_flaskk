@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .class-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* убрал двойной align-items */
+    gap: 24px;
+    padding: 30px 20px;
+    background: #f9f9fb; /* лёгкий фон для контраста */
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    max-width: 480px;
+    margin: 40px auto;
+  }
+
+  .class-title {
+    color: #222;
+    font-size: 36px;
+    margin: 0;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+
+  /* Стиль для ссылки редактирования, как кнопка */
+  .edit-link {
+    background: #007bff;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    user-select: none;
+  }
+  .edit-link:hover,
+  .edit-link:focus {
+    background: #0056b3;
+    box-shadow: 0 8px 25px rgba(0, 86, 179, 0.6);
+    outline: none;
+    transform: translateY(-3px);
+  }
+
+  .class-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+  }
+
+  .class-button-row {
+    display: flex;
+    gap: 22px;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 30px 24px;
+    border-radius: 0 48px 48px 0;
+    flex-wrap: wrap;
+    transition: border-radius 0.7s ease, box-shadow 0.4s ease;
+  }
+  .class-button-row:hover {
+    border-radius: 48px;
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.3);
+  }
+
+  .class-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 24px;
+    color: white;
+    font-size: 20px;
+    width: 70px;
+    height: 44px;
+    cursor: pointer;
+    font-weight: 700;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition:
+      background-color 0.35s ease,
+      box-shadow 0.35s ease,
+      transform 0.25s ease,
+      color 0.25s ease;
+  }
+  .class-btn:hover,
+  .class-btn:focus {
+    background: white !important;
+    color: black !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    transform: scale(1.05) rotateY(15deg) rotateX(45deg) rotateZ(10deg);
+    outline: none;
+  }
+
+  #first-class {
+    background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+  }
+
+  #second-class {
+    background: linear-gradient(90deg, #7F00FF, #00FFFF);
+  }
+
+  #third-class {
+    background: linear-gradient(90deg, #3300FF, #7F00FF);
+  }
+
+  #fourth-class {
+    background: linear-gradient(90deg, #00FF7F, #00FF00);
+  }
+
+  #fifth-class {
+    background: linear-gradient(90deg, #FF8C00, #FF4500);
+  }
+
+  /* Адаптив */
+
+  @media (max-width: 768px) {
+    .class-wrapper {
+      max-width: 100%;
+      padding: 20px 12px;
+    }
+
+    .class-title {
+      font-size: 30px;
+      text-align: center;
+    }
+
+    .edit-link {
+      padding: 10px 18px;
+      font-size: 16px;
+    }
+
+    .class-button-row {
+      justify-content: center;
+      padding: 24px 16px;
+      border-radius: 24px;
+      gap: 16px;
+    }
+
+    .class-btn {
+      width: 60px;
+      height: 40px;
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .class-button-row {
+      gap: 12px;
+      padding: 18px 12px;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 24px;
+    }
+
+    .class-btn {
+      width: 100%;
+      max-width: 220px;
+      font-size: 16px;
+    }
+  }
+</style>
+
+<div class="class-wrapper">
+  <h1 class="class-title">КЛАСС</h1>
+       {% if current_user.has_role('admin') %}
+  <a href="{{ url_for('read_homework') }}" class="edit-link">Редактировать</a>
+        {% endif %}
+  <div class="class-container">
+    <div class="class-button-row">
+      <a href="{{ url_for('read_homework', grade=1) }}" id="first-class" class="class-btn">1</a>
+      <a href="{{ url_for('read_homework', grade=2) }}" id="second-class" class="class-btn">2</a>
+      <a href="{{ url_for('read_homework', grade=3) }}" id="third-class" class="class-btn">3</a>
+    </div>
+    <div class="class-button-row">
+      <a href="{{ url_for('read_homework', grade=4) }}" id="fourth-class" class="class-btn">4</a>
+      <a href="{{ url_for('read_homework', grade=5) }}" id="fifth-class" class="class-btn">5</a>
+    </div>
+  </div>
+</div></div>
+
+{% endblock %}

@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .section-header {
+    text-align: center;
+    font-size: 2rem;
+    margin: 60px 0 30px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .video-grid {
+    display: grid;
+    gap: 40px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    padding: 0 40px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .video-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .video-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-description {
+    padding: 16px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #444;
+  }
+
+  /* Справка */
+  .theory-section {
+    background: #fefefe;
+    padding: 80px 20px 100px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .theory-block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 80px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+  }
+
+  .theory-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .theory-text {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #555;
+  }
+
+  .theory-image {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  }
+
+  @media (min-width: 768px) {
+    .theory-block {
+      flex-direction: row;
+      align-items: center;
+    }
+    .theory-content {
+      flex: 1;
+      padding-right: 30px;
+    }
+    .theory-image {
+      max-width: 320px;
+    }
+    .duration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .duration-card {
+    position: relative;
+    background: #f8f8f8;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .duration-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .duration-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .duration-icon {
+    height: 60px;
+    margin-bottom: 10px;
+    object-fit: contain;
+  }
+
+  .duration-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .duration-card:hover .duration-overlay {
+    opacity: 1;
+  }
+  .note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 18px;
+  margin-top: 40px;
+}
+
+.note-card {
+  position: relative;
+  background: #f0f7ff;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0, 60, 120, 0.1);
+  padding: 18px 12px;
+  text-align: center;
+  transition: transform 0.25s ease;
+  cursor: pointer;
+  overflow: hidden;
+  color: #0b3d91;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.note-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 60, 120, 0.2);
+}
+
+.note-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  object-fit: contain;
+}
+
+.note-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 61, 145, 0.85);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  border-radius: 16px;
+}
+
+.note-card:hover .note-overlay {
+  opacity: 1;
+}
+
+.alteration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 22px;
+  margin-top: 60px;
+}
+
+.alteration-card {
+  position: relative;
+  background: #fff8e1;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(255, 180, 0, 0.15);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  font-weight: 700;
+  color: #b26900;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.alteration-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(255, 180, 0, 0.3);
+}
+
+.alteration-icon {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 10px;
+  object-fit: contain;
+}
+
+.alteration-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(178, 105, 0, 0.9);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  padding: 14px 12px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.alteration-card:hover .alteration-overlay {
+  opacity: 1;
+}
+  
+</style>
+
+<div class="section-header">Теория музыки — обучающие видео</div>
+
+<div class="video-grid">
+
+  <div class="video-card">
+    <div class="video-wrapper">
+      <iframe src="https://www.youtube.com/embed/Ju7DWN0X_9A" allowfullscreen></iframe>
+    </div>
+    <div class="video-description">Основы нотной грамоты для начинающих</div>
+  </div>
+
+  <div class="video-card">
+    <div class="video-wrapper">
+      <iframe src="https://www.youtube.com/embed/W1LTWGP9k3k" allowfullscreen></iframe>
+    </div>
+    <div class="video-description">Что такое интервалы и как они работают</div>
+  </div>
+
+  <div class="video-card">
+    <div class="video-wrapper">
+      <iframe src="https://www.youtube.com/embed/_eFjR3IwL_c" allowfullscreen></iframe>
+    </div>
+    <div class="video-description">Как устроены мажор и минор — простое объяснение</div>
+  </div>
+
+</div>
+
+<!-- Справка -->
+<div class="theory-section">
+  <div class="section-header">Справка по теории музыки</div>
+
+  <div class="theory-block">
+    <div class="theory-content">
+      <div class="theory-title">Длительности нот</div>
+      <div class="theory-text">
+        Музыкальные длительности показывают, сколько времени длится звук. Целая нота длится 4 счета, половинная — 2, четвертная — 1. Есть и более короткие: восьмые, шестнадцатые, тридцать вторые.
+      </div>
+    </div>
+    <img src="/static/durations.png" alt="Длительности нот" class="theory-image">
+  </div>
+  <div class="duration-grid">
+
+  <div class="duration-card">
+    <div class="duration-name">Целая</div>
+    <img src="/static/whole.png" class="duration-icon" alt="Целая нота">
+    <div class="duration-overlay">Длится 4 счета. Самая длинная из основных нот.</div>
+  </div>
+
+  <div class="duration-card">
+    <div class="duration-name">Половинная</div>
+    <img src="/static/half.png" class="duration-icon" alt="Половинная нота">
+    <div class="duration-overlay">Длится 2 счета. Две половинных = целая.</div>
+  </div>
+
+  <div class="duration-card">
+    <div class="duration-name">Четвертная</div>
+    <img src="/static/quarter.png" class="duration-icon" alt="Четвертная нота">
+    <div class="duration-overlay">Одна четверть целой. Самая часто используемая.</div>
+  </div>
+
+  <div class="duration-card">
+    <div class="duration-name">Восьмая</div>
+    <img src="/static/eighth.png" class="duration-icon" alt="Восьмая нота">
+    <div class="duration-overlay">Восьмая часть целой. Обычно с флажком или связками.</div>
+  </div>
+
+</div>
+
+  <div class="theory-block">
+    <div class="theory-content">
+      <div class="theory-title">Названия и расположение нот</div>
+      <div class="theory-text">
+        Основные ноты — До, Ре, Ми, Фа, Соль, Ля, Си. В интернациональном обозначении: C, D, E, F, G, A, B. Их местоположение зависит от ключа и линеек нотного стана.
+      </div>
+    </div>
+    <img src="/static/notes.png" alt="Расположение нот" class="theory-image">
+  </div>
+
+  <h3 style="margin-top: 50px; color: #0b3d91; font-weight: 700;">Основные ноты</h3>
+
+<div class="note-grid">
+  <div class="note-card">
+    <img src="/static/note_do.png" alt="Нота До" class="note-icon">
+    До
+    <div class="note-overlay">Первая нота в диатонической гамме, звучит как C в международной нотации.</div>
+  </div>
+
+  <div class="note-card">
+    <img src="/static/note_re.png" alt="Нота Ре" class="note-icon">
+    Ре
+    <div class="note-overlay">Вторая нота гаммы, звучит как D, используется для построения мажорных и минорных аккордов.</div>
+  </div>
+
+  <div class="note-card">
+    <img src="/static/note_mi.png" alt="Нота Ми" class="note-icon">
+    Ми
+    <div class="note-overlay">Третья нота, звучит как E, часто встречается в мелодиях и аккордах.</div>
+  </div>
+
+  <div class="note-card">
+    <img src="/static/note_fa.png" alt="Нота Фа" class="note-icon">
+    Фа
+    <div class="note-overlay">Четвёртая нота гаммы, звучит как F, важна для создания гармоний.</div>
+  </div>
+
+  <div class="note-card">
+    <img src="/static/note_sol.png" alt="Нота Соль" class="note-icon">
+    Соль
+    <div class="note-overlay">Пятая нота, звучит как G, часто используется для доминантных аккордов.</div>
+  </div>
+
+  <div class="note-card">
+    <img src="/static/note_la.png" alt="Нота Ля" class="note-icon">
+    Ля
+    <div class="note-overlay">Шестая нота гаммы, звучит как A, используется в ладах и мелодиях.</div>
+  </div>
+
+  <div class="note-card">
+    <img src="/static/note_si.png" alt="Нота Си" class="note-icon">
+    Си
+    <div class="note-overlay">Седьмая нота, звучит как B, создает ведущий тон к октавной ноте До.</div>
+  </div>
+</div>
+
+  <div class="theory-block">
+    <div class="theory-content">
+      <div class="theory-title">Знаки альтерации</div>
+      <div class="theory-text">
+        Диез (♯) повышает ноту на полтона, бемоль (♭) понижает. Бекар (♮) отменяет диез или бемоль. Эти знаки могут встречаться в ключе и в такте.
+      </div>
+    </div>
+    <img src="/static/alterations.png" alt="Альтерации" class="theory-image">
+  </div>
+
+  <h3 style="margin-top: 70px; color: #b26900; font-weight: 700;">Знаки альтерации и подводные камни</h3>
+
+<div class="alteration-grid">
+
+  <div class="alteration-card">
+    <img src="/static/sharp.png" alt="Диез (#)" class="alteration-icon">
+    Диез (#)
+    <div class="alteration-overlay">
+      Поднимает ноту на полтона вверх. Важно не путать с бемолем.
+    </div>
+  </div>
+
+  <div class="alteration-card">
+    <img src="/static/flat.png" alt="Бемоль (b)" class="alteration-icon">
+    Бемоль (b)
+    <div class="alteration-overlay">
+      Опускает ноту на полтона вниз. Следи за контекстом лада.
+    </div>
+  </div>
+
+  <div class="alteration-card">
+    <img src="/static/natural.png" alt="Бекар (♮)" class="alteration-icon">
+    Бекар (♮)
+    <div class="alteration-overlay">
+      Отменяет действие диеза или бемоля, возвращая ноту к натуральному звучанию.
+    </div>
+  </div>
+
+  <div class="alteration-card">
+    <img src="/static/double_sharp.png" alt="Двойной диез (x)" class="alteration-icon">
+    Двойной диез (x)
+    <div class="alteration-overlay">
+      Поднимает ноту на целый тон — будьте внимательны, не перепутайте!
+    </div>
+  </div>
+
+  <div class="alteration-card">
+    <img src="/static/double_flat.png" alt="Двойной бемоль (bb)" class="alteration-icon">
+    Двойной бемоль (bb)
+    <div class="alteration-overlay">
+      Опускает ноту на целый тон — часто встречается в модуляциях.
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+{% endblock %}

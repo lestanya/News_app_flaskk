@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .epoch-section {
+    max-width: 1500px;
+    margin: 60px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .epoch-entry {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .epoch-entry:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  .epoch-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .epoch-entry:hover .epoch-image {
+    transform: scale(1.05);
+  }
+
+  .epoch-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .epoch-entry:hover .epoch-overlay {
+    opacity: 1;
+  }
+
+  .epoch-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+
+  .epoch-entry:hover .epoch-title {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    .epoch-title {
+      font-size: 1.3rem;
+      padding: 0 10px;
+    }
+    .epoch-image {
+      height: 160px;
+    }
+  }
+</style>
+
+<div class="epoch-section">
+
+  <a href="{{ url_for('theory') }}" class="epoch-entry">
+    <img src="/static/термуз.png" alt="Барокко" class="epoch-image">
+    <div class="epoch-overlay">
+      <div class="epoch-title">Теория музыки</div>
+    </div>
+  </a>
+
+  <a href="/composers/classical" class="epoch-entry">
+    <img src="/static/игра.png" alt="Классицизм" class="epoch-image">
+    <div class="epoch-overlay">
+      <div class="epoch-title">Учимся играть на инструментах</div>
+    </div>
+  </a>
+
+  <a href="/composers/romantic" class="epoch-entry">
+    <img src="/static/выступление.png" alt="Романтизм" class="epoch-image">
+    <div class="epoch-overlay">
+      <div class="epoch-title">Школьные выступления</div>
+    </div>
+  </a>
+
+
+
+</div>
+
+{% endblock %}

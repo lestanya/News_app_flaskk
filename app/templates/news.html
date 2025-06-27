@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+
+<style>
+  /* Контейнер заголовка + кнопки */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+
+  /* Кнопка добавить справа */
+  .btn-add-news {
+    background: #007bff;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.15s;
+  }
+  .btn-add-news:hover,
+  .btn-add-news:focus {
+    background-color: #0056b3;
+    box-shadow: 0 6px 20px rgba(0, 86, 179, 0.6);
+    transform: translateY(-3px);
+    outline: none;
+  }
+
+  /* Сетка новостей */
+  .news-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+
+  /* карточка */
+  .card-wrapper {
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background: #fff;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .card-wrapper:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .card {
+    border: none;
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 10px;
+    z-index: 5;
+  }
+
+  .card-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    position: relative;
+    color: #555;
+  }
+  .card-actions button:hover {
+    color: #007bff;
+  }
+
+  .card-actions .delete-btn:hover::after,
+  .card-actions .edit-btn:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -28px;
+    right: 0;
+    background-color: #333;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+  }
+
+  .card-actions .delete-btn {
+    color: red;
+  }
+
+  .popover-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 10;
+  }
+
+  .popover-content {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 180px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    font-size: 14px;
+    border-radius: 4px;
+  }
+
+  .popover-wrapper:focus-within .popover-content {
+    display: block;
+  }
+
+  .popover-content button {
+    margin-right: 10px;
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .popover-content .confirm {
+    background-color: red;
+    color: white;
+  }
+
+  .popover-content .cancel {
+    background-color: #ccc;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #222;
+  }
+
+  .card-text {
+    font-size: 1rem;
+    flex-grow: 1;
+    color: #444;
+    margin-bottom: 15px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .text-muted.small {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 15px;
+  }
+
+  .btn-outline-primary {
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1.5px solid #007bff;
+    color: #007bff;
+    background: transparent;
+    text-decoration: none;
+    transition: background-color 0.25s, color 0.25s;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  img.img-fluid {
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    width: 100%;
+  }
+
+  /* Адаптив */
+  @media (max-width: 1024px) {
+    .news-section {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .news-section {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .card-wrapper {
+      max-width: 90vw;
+      margin: 0 auto;
+    }
+  }
+</style>
+
+<main class="container mt-5">
+
+  <div class="header-actions">
+    <h2 class="section-title">📰 Последние новости</h2>
+     {% if is_admin() %}
+    <a href="{{ url_for('add_news') }}" class="btn-add-news" tabindex="0">➕ Добавить новость</a>
+     {% endif %}
+  </div>
+
+  <section class="news-section mb-5">
+
+    {% for n in news %}
+    {% if n.media.title and n.media.content %}
+    <article class="card-wrapper">
+
+
+      {% if is_admin() %}
+      <!-- Кнопки действий -->
+      <div class="card-actions">
+        <button class="edit-btn" data-tooltip="Изменить">✏️</button>
+
+        <div class="popover-wrapper" tabindex="0">
+          <button class="delete-btn" data-tooltip="Удалить">🗑️</button>
+          <div class="popover-content">
+            <p>Точно удалить?</p>
+            <form action="{{ url_for('delete_news', news_id=n.id) }}" method="post">
+              <button type="submit" class="confirm">Да</button>
+              <button type="button" class="cancel" onclick="this.closest('.popover-wrapper').blur();">Нет</button>
+            </form>
+          </div>
+        </div>
+      </div>
+{% endif %}
+      <!-- Содержимое карточки -->
+      <div class="card">
+        <h3 class="card-title">{{ n.media.title }}</h3>
+        <div class="card-text">{{ (n.media.content | safe)[:420] }}{% if n.media.content|length > 420 %}...{% endif %}</div>
+
+       {% if n.file and n.file.file_path %}
+  <div class="file">
+    {% if n.file.file_type == 'PICTURE_PATH' %}
+     
+    {% set filename = n.file.file_path.split('static')[-1] %}
+    <img src="{{ url_for('static', filename=filename[1:]) }}" class="img-fluid" alt="Изображение новости">
+
+     
+    
+    {% elif n.file.file_type == 'VIDEO_PATH' %}
+      <video controls class="img-fluid">
+        <source src="{{ url_for('static', filename=n.file.file_path) }}" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+      </video>
+
+    {% elif n.file.file_type == 'AUDIO_PATH' %}
+      <div class="audio-player">
+        <button class="play-btn" onclick="togglePlay(this)">▶️</button>
+        <div class="progress-container" onclick="setProgress(this)">
+          <div class="progress"></div>
+        </div>
+        <div class="time">0:00</div>
+        <audio preload="metadata" src="{{ url_for('static', filename=n.file.file_path) }}"></audio>
+      </div>
+      <a href="{{ url_for('static', filename=n.file.file_path) }}" download class="download-btn">Скачать аудио</a>
+
+    {% elif n.file.file_type == 'DOCS_PATH' %}
+      <div class="news-doc">
+        📄 <a href="{{ url_for('static', filename=n.file.file_path) }}" target="_blank">Скачать документ</a>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+        <p class="text-muted small">🕒 {{ n.media.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <a href="{{ url_for('news_id', news_id=n.id) }}" class="btn btn-outline-primary">Читать дальше</a>
+      </div>
+    </article>
+    {% endif %}
+    {% endfor %}
+
+  </section>
+</main>
+
+{% endblock %}
+
+

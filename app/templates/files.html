@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<body>
+  <main>
+    <div class = 'container'>
+
+      {% for file in files %}
+      <h>{{ file.title }}</h>
+        <p>Путь: {{ file.file_path }}</p>
+        <img src="file.path">
+        <p>Тип файла: {{ file.file_type }}</p>
+        <p>Расширение: {{ file.file_extension }}</p>
+        <p>Дата загрузки: {{ file.uploaded_at }}</p>
+      {% endfor %}
+    </div>
+
+    
+      <div class="container mt-5">
+          <div class="news-section">
+    
+          <form method="POST" action="{{ url_for('upload_files') }}" enctype="multipart/form-data">
+  
+
+          <div class="mb-3">
+              <label for="file" class="form-label">Прикрепить файл (необязательно)</label>
+              <input class="form-control" type="file" id="file" name="file">
+          </div>
+
+          <button type="submit" class="btn btn-dark">Сохранить</button>
+          </form>
+  </div>
+</div>
+
+ 
+  </main>
+
+
+
+
+</body>
+{% endblock %}
+

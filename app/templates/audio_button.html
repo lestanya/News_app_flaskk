@@ -1,0 +1,126 @@
+<style>
+  .audio-player {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+  }
+
+  .play-btn {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: background 0.3s;
+  }
+
+  .play-btn:hover {
+    background: rgba(255,255,255,0.6);
+  }
+
+  .progress-container {
+    flex: 1;
+    background: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    height: 6px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .progress {
+    height: 100%;
+    background: #000;
+    width: 0%;
+    border-radius: 5px;
+    transition: width 0.1s;
+  }
+
+  .time {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    width: 50px;
+    text-align: right;
+  }
+
+  .download-btn {
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  .download-btn:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+</style>
+
+<div class="audio-player" data-id="{{ id }}">
+  <button class="play-btn" id="playPauseBtn-{{ id }}">▶️</button>
+  <div class="progress-container" id="progressContainer-{{ id }}">
+    <div class="progress" id="progressBar-{{ id }}"></div>
+  </div>
+  <div class="time" id="currentTime-{{ id }}">0:00</div>
+</div>
+
+<audio id="audio-{{ id }}" src="{{ audio_src }}"></audio>
+<a href="{{ audio_src }}" download class="download-btn">Скачать аудио</a>
+
+<script>
+  (function() {
+    const id = "{{ id }}";
+    const audio = document.getElementById('audio-' + id);
+    const playBtn = document.getElementById('playPauseBtn-' + id);
+    const progress = document.getElementById('progressBar-' + id);
+    const progressContainer = document.getElementById('progressContainer-' + id);
+    const currentTimeText = document.getElementById('currentTime-' + id);
+
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        playBtn.textContent = '⏸️';
+      } else {
+        audio.pause();
+        playBtn.textContent = '▶️';
+      }
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = percent + '%';
+
+      const minutes = Math.floor(audio.currentTime / 60);
+      const seconds = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+      currentTimeText.textContent = `${minutes}:${seconds}`;
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+      const width = progressContainer.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audio.duration;
+
+      audio.currentTime = (clickX / width) * duration;
+    });
+
+    audio.addEventListener('ended', () => {
+      playBtn.textContent = '▶️';
+    });
+  })();
+</script>

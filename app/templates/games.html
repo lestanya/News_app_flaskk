@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+  .game-main {
+    margin: 50px auto;
+    background: linear-gradient(to bottom, #fff, #ddd);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 50vw;
+    height: 70vh;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  .hearts {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .hearts img {
+    width: 30px;
+  }
+
+  #note-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 50px;
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+
+  .note-wrapper {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .piano-wrapper {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    height: 186px;
+    background: #202020;
+    border-radius: 50px 10px 150px 130px;
+    box-shadow: 0 0 90px 30px rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 10px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .piano-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 560px;
+    height: 160px;
+    background: #f4f4f4ad;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 10px;
+    box-shadow: 0 0 30px 10px rgba(255, 255, 255, 0.6);
+    z-index: 1;
+  }
+
+  .piano {
+    position: relative;
+    width: 530px;
+    height: 140px;
+    display: flex;
+    z-index: 5;
+  }
+
+  .key.white {
+    width: 66px;
+    height: 100%;
+    background: linear-gradient(to bottom, #fff, #ddd);
+    border: 1px solid #333;
+    box-sizing: border-box;
+    z-index: 2;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .key.white:hover {
+    transform: translateY(3px);
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .key:active {
+    opacity: 0.7;
+  }
+
+  .black-keys {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 80%;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .key.black {
+    position: absolute;
+    width: 40px;
+    height: 80%;
+    background: linear-gradient(to bottom, #111, #444);
+    z-index: 10;
+    border-radius: 0 0 6px 6px;
+    pointer-events: all;
+    cursor: pointer;
+    box-shadow:
+      0 6px 14px rgba(0, 0, 0, 0.7),
+      inset 0 -4px 6px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .key.black:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 16px rgba(0, 0, 0, 0.8),
+      inset 0 -6px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .key.black:active {
+    transform: translateY(4px);
+  }
+
+  .key.black[data-note="c-sharp"] { left: 46px; }
+  .key.black[data-note="d-sharp"] { left: 112px; }
+  .key.black[data-note="f-sharp"] { left: 245px; }
+  .key.black[data-note="g-sharp"] { left: 311px; }
+  .key.black[data-note="a-sharp"] { left: 377px; }
+
+  .restart-button {
+    background: #8B0000;
+    color: #fff;
+    padding: 12px 28px;
+    font-size: 20px;
+    font-family: 'Courier New', monospace;
+    border: 2px solid #550000;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #aa0000, inset 0 0 10px #550000;
+    transition: transform 0.2s, background 0.3s;
+  }
+
+  .restart-button:hover {
+    background: #a00000;
+    transform: scale(1.05);
+  }
+
+  .restart-button:active {
+    background: #ff0000;
+    box-shadow: 0 0 10px #ff0000;
+  }
+
+  #image-container {
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 0;
+}
+
+#image-container img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+#restart-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  z-index: 10;
+  text-align: center;
+}
+
+</style>
+
+<div class="game-main">
+  <div class="game">
+    <div class="hearts">
+      <img src="{{ url_for('static', filename='heart.png') }}" alt="сердце">
+      <img src="{{ url_for('static', filename='heart.png') }}" alt="сердце">
+      <img src="{{ url_for('static', filename='heart.png') }}" alt="сердце">
+      <img src="{{ url_for('static', filename='heart.png') }}" alt="сердце">
+      <img src="{{ url_for('static', filename='heart.png') }}" alt="сердце">
+    </div>
+
+    <div class="note-wrapper">
+      <img id="note-image" src="{{ url_for('static', filename='heart.png') }}" alt="Нота">
+    </div>
+
+    <div class="piano-wrapper"></div>
+
+    <div class="piano-container">
+      <div class="piano">
+        <div class="key white" data-note="c"></div>
+        <div class="key white" data-note="d"></div>
+        <div class="key white" data-note="e"></div>
+        <div class="key white" data-note="f"></div>
+        <div class="key white" data-note="g"></div>
+        <div class="key white" data-note="a"></div>
+        <div class="key white" data-note="b"></div>
+        <div class="key white" data-note="c-upper"></div>
+        <div class="black-keys">
+          <div class="key black" data-note="c-sharp"></div>
+          <div class="key black" data-note="d-sharp"></div>
+          <div class="key black" data-note="f-sharp"></div>
+          <div class="key black" data-note="g-sharp"></div>
+          <div class="key black" data-note="a-sharp"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+   <audio id="note-c" src="{{ url_for('static', filename='sounds/zvuk-notyi-do.mp3') }}"></audio>
+<audio id="note-d" src="{{ url_for('static', filename='sounds/zvuk-notyi-re.mp3') }}"></audio>
+<audio id="note-e" src="{{ url_for('static', filename='sounds/zvuk-notyi-mi.mp3') }}"></audio>
+<audio id="note-f" src="{{ url_for('static', filename='sounds/zvuk-notyi-fa.mp3') }}"></audio>
+<audio id="note-g" src="{{ url_for('static', filename='sounds/zvuk-notyi-sol.mp3') }}"></audio>
+<audio id="note-a" src="{{ url_for('static', filename='sounds/zvuk-notyi-lya.mp3') }}"></audio>
+<audio id="note-b" src="{{ url_for('static', filename='sounds/zvuk-notyi-si.mp3') }}"></audio>
+
+<audio id="note-c-sharp" src="{{ url_for('static', filename='sounds/звуки/c-sharp.mp3') }}"></audio>
+<audio id="note-d-sharp" src="{{ url_for('static', filename='sounds/звуки/d-sharp.mp3') }}"></audio>
+<audio id="note-f-sharp" src="{{ url_for('static', filename='sounds/звуки/f-sharp.mp3') }}"></audio>
+<audio id="note-g-sharp" src="{{ url_for('static', filename='sounds/звуки/g-sharp.mp3') }}"></audio>
+<audio id="note-a-sharp" src="{{ url_for('static', filename='sounds/звуки/a-sharp.mp3') }}"></audio>
+
+  <div id="image-container"></div>
+  <div id="restart-container" style="display: none; margin-top: 130px;">
+    <button id="restart-button" class="restart-button">НАЧАТЬ ЗАНОВО</button>
+  </div>
+</div>
+
+<script>
+  const notes = [
+    "c", "d", "e", "f", "g", "a", "b",
+    "c-sharp", "d-sharp", "f-sharp", "g-sharp", "a-sharp"
+  ];
+  const keys = document.querySelectorAll('.key');
+  const noteImage = document.getElementById('note-image');
+  const staticPrefix = "{{ url_for('static', filename='') }}";
+  let count = 5;
+  let currentNote = "";
+
+  function randomNote() {
+    return notes[Math.floor(Math.random() * notes.length)];
+  }
+
+  function setNewNote() {
+    currentNote = randomNote();
+    noteImage.src = `${staticPrefix}note-${currentNote}.jpg`;
+  }
+
+  function playAudio(note) {
+    const audio = document.getElementById(`note-${note}`);
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play();
+    }
+  }
+
+  function handleClick(note) {
+    playAudio(note);
+    if (note === currentNote) {
+      document.body.style.background = 'linear-gradient(135deg, #d8e7dc, #6fea82, #00ff48)';
+      setTimeout(() => {
+        document.body.style.background = '';
+        setNewNote();
+      }, 1000);
+    } else {
+      document.body.style.background = 'red';
+      setTimeout(() => {
+        document.body.style.background = '';
+      }, 1000);
+
+      const hearts = document.querySelectorAll('.hearts img');
+      if (count > 0 && hearts[count - 1]) {
+        
+        hearts[count - 1].src = `${staticPrefix}blaсk_heart.png`;
+      }
+
+      count -= 1;
+
+      if (count <= 0) {
+        document.querySelector('.game').style.display = 'none';
+        const img = document.createElement('img');
+        img.src = `${staticPrefix}gameover.png`;
+        img.alt = 'Ты проиграл';
+        const container = document.querySelector('#image-container');
+        container.innerHTML = '';
+        container.append(img);
+        document.getElementById('restart-container').style.display = 'block';
+      }
+    }
+  }
+
+  keys.forEach(key => {
+    key.addEventListener('click', () => {
+      const note = key.getAttribute('data-note');
+      handleClick(note);
+    });
+  });
+
+  document.getElementById('restart-button').addEventListener('click', () => {
+    location.reload();
+  });
+
+  setNewNote();
+</script>
+
+{% endblock %}
+

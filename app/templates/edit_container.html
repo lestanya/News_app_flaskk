@@ -1,0 +1,104 @@
+
+<style>
+
+    .card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+    overflow: visible;
+  }
+
+  .card-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    position: relative;
+    overflow: visible;
+  }
+
+  .card-actions .edit-btn:hover::after,
+  .card-actions .delete-btn:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -28px;
+    right: 0;
+    background-color: #333;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+  }
+
+  .card-actions .delete-btn {
+    color: red;
+  }
+
+  .popover-wrapper {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    z-index: 10;
+  }
+
+  .popover-content {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 999;
+    width: 180px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    border-radius: 4px;
+  }
+
+  .popover-wrapper:focus-within .popover-content {
+    display: block;
+  }
+
+  .popover-content button {
+    margin-right: 10px;
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .popover-content .confirm {
+    background-color: red;
+    color: white;
+  }
+
+  .popover-content .cancel {
+    background-color: #ccc;
+  }
+
+</style>
+
+
+<!-- Кнопки действий -->
+      <div class="card-actions">
+        <button class="edit-btn" data-tooltip="Изменить">✏️</button>
+
+        <div class="popover-wrapper" tabindex="0">
+          <button class="delete-btn" data-tooltip="Удалить">🗑️</button>
+          <div class="popover-content">
+            <p>Точно удалить?</p>
+            <form action="{{ form_action }}" method="post">
+              <button type="submit" class="confirm">Да</button>
+              <button type="button" class="cancel" onclick="this.closest('.popover-wrapper').blur();">Нет</button>
+            </form>
+          </div>
+        </div>
+      </div>

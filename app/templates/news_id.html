@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .news-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 32px;
+  }
+
+  .arrow-nav {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 12px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  .arrow-nav:hover {
+    color: #000;
+  }
+
+  .arrow-left {
+    left: 16px;
+  }
+
+  .arrow-right {
+    right: 16px;
+  }
+
+  .news-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .news-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .news-title {
+    font-size: 3.25rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  .news-content {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 16px;
+  }
+
+  .news-media {
+    margin-bottom: 16px;
+  }
+
+  .news-media img,
+  .news-media video {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .news-media audio {
+    width: 100%;
+  }
+
+  .news-doc {
+    background: #f0f4ff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  .news-doc a {
+    color: #3366cc;
+    text-decoration: none;
+  }
+
+  .news-doc a:hover {
+    text-decoration: underline;
+  }
+
+  .news-date {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+      .file {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* Custom audio player */
+    .audio-player {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .play-btn {
+      background: rgba(255,255,255,0.3);
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+
+    .play-btn:hover {
+      background: rgba(255,255,255,0.6);
+    }
+
+    .progress-container {
+      flex: 1;
+      background: rgba(255,255,255,0.3);
+      border-radius: 5px;
+      height: 6px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .progress {
+      height: 100%;
+      background: #000;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.1s;
+    }
+
+    .time {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      width: 50px;
+      text-align: right;
+    }
+
+    .download-btn {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.3);
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .download-btn:hover {
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+
+<div class="news-wrapper">
+   {% for n in news %}
+  <!-- Левая стрелка -->
+  <a href="{{  url_for('back_arrow', news_id=n.id) }}" class="arrow-nav arrow-left" aria-label="Предыдущая страница">←</a>
+  <input type='hidden' id='current-id' value="{{ n.id }}">
+  <input type='hidden' id='file-input-path' value="{{ n.file.file_path }}">
+  <!-- Сетка новостей -->
+  <div class="news-container">
+   
+    <div class="news-card">
+      <div class="news-title">{{ n.media.title }}</div>
+      <div class="news-content">{{ n.media.content | safe }}</div>
+
+      {% if n.file and n.file.file_path %}
+      <div class="news-media">
+        {% if n.file.file_type == 'PICTURE_PATH' %}
+          <img src="{{ url_for('static', filename=n.file.file_path) }}" alt="Изображение новости">
+        {% elif n.file.file_type == 'VIDEO_PATH' %}
+          <video controls>
+            <source src="{{ url_for('static', filename=n.file.file_path) }}" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+          </video>
+        {% elif n.file.file_type == 'AUDIO_PATH' %}
+       
+          <div class="file">
+              <div class="audio-player">
+                <button class="play-btn" id="playPauseBtn">▶️</button>
+                <div class="progress-container" id="progressContainer">
+                  <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="time" id="currentTime">0:00</div>
+              </div>
+              <a href="{{ url_for('static', filename=n.file.file_path) }}" download class="download-btn">Скачать аудио</a>
+              <audio id="audio" src="{{ url_for('static', filename=n.file.file_path) }}"></audio>
+            </div>
+          </div>
+        {% elif n.file.file_type == 'DOCS_PATH' %}
+          <div class="news-doc">
+            📄 <a href="{{ url_for('static', filename=n.file.file_path) }}" target="_blank">Скачать документ</a>
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="news-date">🕒 {{ n.media.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+    </div>
+   
+  </div>
+
+  <!-- Правая стрелка -->
+  <a href="{{  url_for('next_arrow', news_id=n.id) }}" class="arrow-nav arrow-right" id='next' aria-label="Следующая страница">→</a>
+</div>
+
+
+
+ {% endfor %}
+{% endblock %}

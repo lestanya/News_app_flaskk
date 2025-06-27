@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .card {
+    position: relative;
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  .homework-circle {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ffc107;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+  }
+
+  .card-body {
+    padding-left: 3rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 2rem 0 1rem;
+  }
+
+  /* -------- NEWS SLIDER -------- */
+  .news-slider-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .news-slider {
+    display: flex;
+    transition: transform 0.4s ease;
+    gap: 1rem;
+  }
+
+  .news-slider .slide {
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #222;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 2rem;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 1;
+    opacity: 0.7;
+  }
+
+  .slider-btn:hover {
+    background: #444;
+    opacity: 1;
+  }
+
+  .slider-btn.prev {
+    left: 10px;
+  }
+
+  .slider-btn.next {
+    right: 10px;
+  }
+
+  /* -------- HOMEWORK GRID -------- */
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+</style>
+
+<main class="container">
+  <!-- Секция новостей -->
+  <div class="news-section">
+    <div class="section-title">НОВОСТИ</div>
+
+    <div class="news-slider-container">
+      <div class="news-slider" id="newsSlider">
+        {% for n in news %}
+          <div class="card slide">
+            <div class="card-body">
+              <h5 class="card-title">{{ n.media.title }}</h5>
+              <p class="card-text">{{ (n.media.content | safe)[:420] }}</p>
+              <a href="{{ url_for('news_id', news_id=n.id) }}" class="read-more">ЧИТАТЬ ДАЛЬШЕ</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <button class="slider-btn prev" onclick="moveSlide(-1)">‹</button>
+      <button class="slider-btn next" onclick="moveSlide(1)">›</button>
+    </div>
+  </div>
+
+  <!-- Секция домашних заданий -->
+  <div class="news-section">
+    <div class="section-title">ДОМАШНИЕ ЗАДАНИЯ</div>
+    <div class="news-grid">
+      {% for h in homework %}
+        <div class="card">
+          <div class="homework-circle">{{ h.grade.value }}</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ h.media.title }}</h5>
+            <p class="card-text">{{ h.media.content | safe }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+
+<script>
+  let currentIndex = 0;
+  const slider = document.getElementById("newsSlider");
+  const slides = slider.querySelectorAll(".slide");
+
+  function moveSlide(direction) {
+    currentIndex += direction;
+    if (currentIndex < 0) currentIndex = slides.length - 1;
+    if (currentIndex >= slides.length) currentIndex = 0;
+    slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<style>
+
+
+
+.container .login-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease;
+}
+
+.container .login-btn:hover {
+  background-color: #0056b3;
+}
+
+
+
+</style>
+
+<div class="container">
+    <form id='auth-form' action='{{ url_for('login', email=email) }}' method='POST'>
+        <input type='text' name='email' placeholder='Email' autocomplete="off">
+        <input type='password' name='password' placeholder='Password' autocomplete="off">
+        <input type="tel" id="phone" name="phone" placeholder="+1 (XXX) XXX-XX-XX" autocomplete="off">
+        <input type='submit' value='Login' onclick="setFormAction('login')">
+        <input type='button' value='Register' onclick="setFormAction('register')">
+    </form>
+</div>
+
+<script>
+
+    function setFormAction(action) {
+        const form = document.getElementById('auth-form');
+
+        if (action=='login') {
+            form.action = '{{ url_for('login') }}';
+            form.method = 'post';
+            form.submit();
+
+        } else if (action='register') {
+            form.action = '{{ url_for('register') }}';
+            form.method = 'post';
+            form.submit();
+        }
+
+    }
+
+</script>
+
+{% endblock %}

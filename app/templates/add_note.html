@@ -1,0 +1,325 @@
+
+<!-- Подключаем CKEditor -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+
+<style>
+  /* Основной фон формы — белый, с фиолетовым акцентом */
+  .news-form {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 36px 32px;
+    max-width: 720px;
+    margin: 3rem auto;
+    box-shadow: 0 8px 24px rgba(102, 51, 153, 0.2);
+    position: relative;
+    transition: box-shadow 0.35s ease;
+  }
+  .news-form:hover,
+  .news-form:focus-within {
+    box-shadow: 0 12px 40px rgba(138, 43, 226, 0.6);
+  }
+
+  /* Заголовок — фиолетовый, крупный, с тенью */
+  .news-form h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.75rem;
+    color: #6a0dad; /* насыщенный фиолетовый */
+    text-shadow: 0 2px 8px rgba(106, 13, 173, 0.3);
+    user-select: none;
+  }
+
+  /* Метки */
+  label.form-label {
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #4b0082; /* темный индиго */
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* Поля ввода и селект — белые с фиолетовой рамкой */
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    width: 100%;
+    border-radius: 20px;
+    border: 2px solid #d8b4fe; /* светлый фиолетовый */
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    background: #fff;
+    color: #3b0066;
+    box-shadow: inset 0 2px 8px rgba(106, 13, 173, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  input.form-control::placeholder,
+  textarea::placeholder {
+    color: #bfa5ff;
+  }
+
+  input.form-control:focus,
+  select.form-select:focus,
+  textarea.form-control:focus {
+    border-color: #7c3aed; /* насыщенный фиолетовый */
+    box-shadow: 0 0 10px #a78bfa;
+    outline: none;
+    background: #faf5ff;
+  }
+
+  /* CKEditor контейнер */
+  #editor {
+    border-radius: 20px !important;
+    border: 2px solid #d8b4fe !important;
+    min-height: 180px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+    background: #fff;
+  }
+  #editor:focus-within {
+    border-color: #7c3aed !important;
+    box-shadow: 0 0 14px #a78bfa !important;
+  }
+
+  /* Кнопка Сохранить — градиент фиолетовый с подсветкой */
+  button.btn-success {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    border: none;
+    padding: 14px 36px;
+    font-size: 1.25rem;
+    border-radius: 30px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(124, 58, 237, 0.5);
+    transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.25s ease;
+    user-select: none;
+    display: inline-block;
+    margin-top: 1.5rem;
+  }
+  button.btn-success:hover,
+  button.btn-success:focus {
+    background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    box-shadow: 0 12px 32px rgba(167, 139, 250, 0.8);
+    transform: translateY(-3px);
+    outline: none;
+  }
+
+  /* Кнопки действий (редактировать/удалить) — фиолетовые и с эффектом */
+  .card-actions {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+  }
+  .card-actions button {
+    background: transparent;
+    border-radius: 18px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 6px 10px;
+    color: #6a0dad;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    position: relative;
+  }
+  .card-actions button:hover,
+  .card-actions button:focus {
+    background-color: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+    outline: none;
+  }
+  .card-actions .delete-btn:hover,
+  .card-actions .delete-btn:focus {
+    background-color: #e11d48; /* красный для удаления */
+    border-color: #e11d48;
+    color: white;
+  }
+
+  /* Всплывающие подсказки */
+  .card-actions button:hover::after,
+  .card-actions button:focus::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -34px;
+    right: 0;
+    background-color: #4b0082;
+    color: #fff;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0.9;
+    user-select: none;
+    box-shadow: 0 4px 10px rgba(75, 0, 130, 0.5);
+  }
+
+  /* Всплывающие окна подтверждения */
+  .popover-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .popover-content {
+    display: none;
+    position: absolute;
+    top: 38px;
+    right: 0;
+    background: #faf5ff;
+    border: 2px solid #7c3aed;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+    font-size: 15px;
+    border-radius: 20px;
+    width: 240px;
+    z-index: 1000;
+  }
+  .popover-wrapper:focus-within .popover-content {
+    display: block;
+  }
+  .popover-content button {
+    margin-right: 14px;
+    padding: 10px 18px;
+    font-size: 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+  }
+  .popover-content .confirm {
+    background-color: #e11d48;
+    color: white;
+  }
+  .popover-content .confirm:hover,
+  .popover-content .confirm:focus {
+    background-color: #be123c;
+    outline: none;
+  }
+  .popover-content .cancel {
+    background-color: #d8b4fe;
+    color: #4b0082;
+  }
+  .popover-content .cancel:hover,
+  .popover-content .cancel:focus {
+    background-color: #a78bfa;
+    color: #3b0066;
+    outline: none;
+  }
+
+  /* Заголовки и тексты карточек */
+  .card-title {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #6a0dad;
+    margin-bottom: 0.6rem;
+  }
+  .card-text {
+    font-size: 1.3rem;
+    color: #4b0082;
+  }
+
+  /* Мобильная адаптация */
+  @media (max-width: 768px) {
+    .news-form {
+      padding: 28px 22px;
+      margin: 2rem 1rem;
+    }
+    .news-form h3 {
+      font-size: 2rem;
+    }
+    button.btn-success {
+      width: 100%;
+      padding: 16px 0;
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+
+<main class="container mt-5">
+
+ 
+
+  <!-- Универсальная форма для новости или домашнего задания -->
+  <div class="news-form bg-light p-4 rounded shadow-sm mt-5">
+    <h3 class="mb-4">
+      {% if is_homework %}
+        📚 Добавить домашнее задание
+      {% else %}
+        ✏️ Добавить новость
+      {% endif %}
+    </h3>
+
+    <form method="POST" action="{{ form_action }}" enctype="multipart/form-data" id="news-form">
+      <div class="mb-3">
+        <label for="title" class="form-label">Заголовок</label>
+        <input type="text" class="form-control" id="title" name="title" required placeholder="Введите заголовок">
+      </div>
+
+      {% if is_homework %}
+      <div class="mb-3">
+        <label for="class_number" class="form-label">Класс</label>
+        <select class="form-select" id="class_number" name="class_number" required>
+          <option value="" disabled selected>Выберите класс</option>
+       
+          {% for el in grade %}
+            <option value="{{ el.value }}">{{ el.value }}</option>
+          
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="editor" class="form-label">
+          {% if is_homework %}Текст задания{% else %}Текст новости{% endif %}
+        </label>
+        <textarea id="editor" placeholder="Введите текст..."></textarea>
+        <input type="hidden" id="hiddenContent" name="content" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="file" class="form-label">Прикрепить изображение (опционально)</label>
+        <input type="file" class="form-control" id="file" name="file">
+      </div>
+
+      <button type="submit" class="btn btn-success">💾 Сохранить</button>
+    </form>
+  </div>
+
+</main>
+
+<script>
+  let editorInstance;
+
+  ClassicEditor
+    .create(document.querySelector('#editor'), {
+      toolbar: [
+        'heading', '|',
+        'bold', 'italic', 'underline', 'strikethrough', '|',
+        'fontColor', 'fontBackgroundColor', '|',
+        'link', 'bulletedList', 'numberedList', '|',
+        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+      ],
+    })
+    .then(editor => {
+      editorInstance = editor;
+    })
+    .catch(error => {
+      console.error(error);
+    });
+
+  document.querySelector('#news-form').addEventListener('submit', function (e) {
+    const content = editorInstance.getData().trim();
+    document.querySelector('#hiddenContent').value = content;
+
+    if (!content) {
+      e.preventDefault();
+      alert('Пожалуйста, введите текст.');
+    }
+  });
+</script>
+
+
